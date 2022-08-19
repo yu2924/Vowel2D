@@ -265,10 +265,11 @@ public:
 		float a = 0;
 	};
 	std::array<Mkr, 2> mMkrs;
+	juce::ToggleButton mAmpLockButton;
 	AsyncInvoker mAsyncUpdateParams;
 	AsyncInvoker mAsyncUpdateRunStat;
 	AsyncInvoker mAsyncUpdateFftBuf;
-	enum { MarkerSize = 16 };
+	enum { MarkerSize = 16, CheckBocSize = 24 };
 	FPlotView(Vowel2DAudioProcessor* p)
 		: mProcessor(p)
 	{
@@ -303,9 +304,10 @@ public:
 			};
 			mkr.mk.onDragMove = [&mkr, this](juce::Point<int> pt)
 			{
+				bool amplock = mAmpLockButton.getToggleState();
 				juce::Point<int> ptl = getLocalPoint(&mkr.mk, pt);
 				mkr.paramf->setValueNotifyingHost(mkr.pcf->NativeToControl(x2f(ptl.x)));
-				mkr.parama->setValueNotifyingHost(mkr.pca->NativeToControl(y2a(ptl.y)));
+				if(!amplock) mkr.parama->setValueNotifyingHost(mkr.pca->NativeToControl(y2a(ptl.y)));
 			};
 			mkr.mk.onDragEnd = [&mkr]()
 			{
@@ -318,6 +320,9 @@ public:
 				mkr.parama->setValueNotifyingHost(mkr.parama->getDefaultValue());
 			};
 		}
+		mAmpLockButton.setButtonText("Lock Amplitude");
+		mAmpLockButton.setToggleState(true, juce::NotificationType::dontSendNotification);
+		addAndMakeVisible(mAmpLockButton);
 		mAsyncUpdateParams.onUpdate = [this]()
 		{
 			updateMarkerPosition(0);
@@ -445,6 +450,9 @@ public:
 		updateXZTable();
 		updateFiltPtTable();
 		updateFftPlotTable();
+		mAmpLockButton.setSize(128, CheckBocSize);
+		mAmpLockButton.changeWidthToFitText();
+		mAmpLockButton.setTopLeftPosition(mPlotRect.getTopLeft());
 	}
 	virtual void paint(juce::Graphics& g) override
 	{
