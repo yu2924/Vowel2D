@@ -1,6 +1,6 @@
 //
 //  PulseInstrument.h
-//  Vowel2D_SharedCode
+//  Vowel2D
 //
 //  Created by yu2924 on 2017-11-05
 //  (c) 2017 yu2924
@@ -55,7 +55,7 @@ public:
 	}
 	bool IsSounding() const
 	{
-		return (0 < mGate) || (0.001f <= mLag.GetLastValue());
+		return (0 < mGate) || (0.001f <= mLag.GetValue());
 	}
 	float Process()
 	{
